@@ -1,87 +1,93 @@
 package ftcc.initech.triadareaultimate;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import ftcc.initech.triadareaultimate.fragment.*;
 
-import ftcc.initech.triadareaultimate.controller.HashMapMenuAdapter;
 
-public class MainActivity extends AppCompatActivity {
-    private LinkedHashMap<String, Integer> mMenuMap;
+public class MainActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener{
+
+    //Class Variables
+    private static final long DRAWER_CLOSE_DELAY_MS = 250;
+    private static final String NAV_ITEM_ID = "navItemId";
+    private final Handler mDrawerActionHandler = new Handler();
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
+    private int mNavItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // TODO: 3/16/17 change from using string array to menuItem model
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mMenuMap = new LinkedHashMap<>();
-        mMenuMap.put("Home", R.drawable.ic_home_black_24dp);
-        mMenuMap.put("News", R.drawable.ic_rss_feed_24px);
-        mMenuMap.put("Calendar", R.drawable.ic_event_black_24dp);
-        mMenuMap.put("Settings", R.drawable.ic_settings_applications_black_24dp);
-
-        mDrawerList = (ListView) findViewById(R.id.menu_drawer);
-        mDrawerList.setAdapter(new HashMapMenuAdapter(mMenuMap));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        mTitle = mDrawerTitle = getTitle();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout,
-                R.string.drawer_open, R.string.drawer_close) {
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                getActionBar().setTitle(mTitle);
-                invalidateOptionsMenu();
-            }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                getActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu();
-            }
-        };
-        // TODO: 3/16/17 setDrawerListener is deprecated, find its replacement 
+        //Load any saved state
+        if (null == savedInstanceState) {
+            mNavItemId = R.id.menu_item_home;
+        } else {
+            mNavItemId = savedInstanceState.getInt(NAV_ITEM_ID);
+        }
+
+        //prepare the nav drawer
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_drawer);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().findItem(mNavItemId).setChecked(true);
+
+        //set up menu hamburger
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,
+                R.string.drawer_open, R.string.drawer_close);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+
+        exec(mNavItemId);
     }
 
-    /**
-     * Swaps selected item corresponding fragment into content_frame
-     */
-    private void selectItem(int position) {
-        // TODO: 3/16/17 Implement Compat Fragments
-        Fragment fragment = new Fragment();
-        FragmentManager fragmentManager = getFragmentManager();
+    //performs fragment switching
+    private void exec(int itemId){
+        // TODO: 3/23/2017 add fragment logic
+        Fragment fragment;
+        switch(itemId){
+            case R.id.menu_item_home:
+                fragment = new HomeFragment();
+                break;
+            case R.id.menu_item_feed:
+                fragment = new NewsFragment();
+                break;
+            default:
+                fragment = new HomeFragment();
+                break;
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-        mDrawerList.setItemChecked(position, true);
-        setTitle(new ArrayList<String>(mMenuMap.keySet()).get(position));
-        mDrawerLayout.closeDrawer(mDrawerList);
     }
+
 
     @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        getActionBar().setTitle(mTitle);
+    public boolean onNavigationItemSelected(final MenuItem menuItem){
+        menuItem.setChecked(true);
+        mNavItemId = menuItem.getItemId();
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+        mDrawerActionHandler.postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                exec(menuItem.getItemId());
+            }
+        }, DRAWER_CLOSE_DELAY_MS);
+        return true;
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-    }
 }

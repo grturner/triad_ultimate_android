@@ -2,4 +2,9 @@
     <string name="app_name">Triad Area Ultimate</string>
     <string name="drawer_open">Menu</string>
     <string name="drawer_close">Menu_Closed</string>
+    <string name="menu_item_home">Home</string>
+    <string name="menu_item_feed">News</string>
+    <string name="menu_item_events">Events</string>
+    <string name="menu_item_options">Options</string>
+    <string name="facebook_app_id">1578803498826781</string>
 </resources>
