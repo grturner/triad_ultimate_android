@@ -5,31 +5,40 @@ package ftcc.initech.triadareaultimate.model;
  */
 
 public class NewsItem {
-    String message;
-    String date;
-    String author;
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
+    String mAuthor;
+    String mDate;
+    String mPost;
+    String mPicture;
 
     public String getAuthor() {
-        return author;
+        return mAuthor;
     }
 
     public void setAuthor(String author) {
-        this.author = author;
+        mAuthor = author;
+    }
+
+    public String getDate() {
+        return mDate;
+    }
+
+    public void setDate(String date) {
+        mDate = date;
+    }
+
+    public String getPost() {
+        return mPost;
+    }
+
+    public void setPost(String post) {
+        mPost = post;
+    }
+
+    public String getPicture() {
+        return mPicture;
+    }
+
+    public void setPicture(String picture) {
+        mPicture = picture;
     }
 }
