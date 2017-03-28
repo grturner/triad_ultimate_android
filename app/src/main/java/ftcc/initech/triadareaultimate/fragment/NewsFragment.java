@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -14,11 +15,11 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 import ftcc.initech.triadareaultimate.R;
 import ftcc.initech.triadareaultimate.model.NewsItem;
@@ -31,6 +32,24 @@ public class NewsFragment extends Fragment {
     private JSONArray mFeedArray;
     private JSONObject mFeedResponse;
     private NewsItem[] mNewsItems;
+
+    private static NewsItem[] createArray(JSONArray feedArray) {
+        NewsItem[] newsArray = new NewsItem[feedArray.length()];
+        for (int i = 0; i < feedArray.length(); i++) {
+            newsArray[i] = new NewsItem();
+            try {
+                JSONObject o = feedArray.getJSONObject(i);
+                newsArray[i].setAuthor(o.getString("id"));
+                newsArray[i].setDate(o.getString("created_time"));
+                newsArray[i].setPost(o.getString("message"));
+                // TODO: 3/27/2017 handle situation where facebook returns no full_picture
+                newsArray[i].setPicture(o.getString("full_picture"));
+            } catch (JSONException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return newsArray;
+    }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
@@ -63,25 +82,6 @@ public class NewsFragment extends Fragment {
         return view;
     }
 
-    private static NewsItem[] createArray(JSONArray feedArray){
-        NewsItem[] newsArray = new NewsItem[feedArray.length()];
-        for (int i = 0; i < feedArray.length(); i++){
-            newsArray[i] = new NewsItem();
-            try {
-                JSONObject o = feedArray.getJSONObject(i);
-                newsArray[i].setAuthor("author: " + o.getString("id"));
-                newsArray[i].setDate("timestamp: " + o.getString("created_time"));
-                newsArray[i].setPost("payload: " + o.getString("message"));
-                // TODO: 3/27/2017 handle situation where facebook returns no full_picture
-                newsArray[i].setPicture("avatar: " + o.getString("full_picture"));
-            }
-            catch (JSONException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return newsArray;
-    }
-
     private class FeedListAdapter extends ArrayAdapter<NewsItem> {
         // TODO: 3/27/2017 more formatting, convert icon to ImageView
         public FeedListAdapter(Context context, NewsItem[] newsItems){
@@ -90,18 +90,18 @@ public class NewsFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent){
-            NewsItem item = getItem(position);
+            final NewsItem item = getItem(position);
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.feed_list_item,
                         parent, false);
             }
             TextView author = (TextView) convertView.findViewById(R.id.feed_item_author);
-            TextView icon = (TextView) convertView.findViewById(R.id.feed_item_icon);
+            ImageView icon = (ImageView) convertView.findViewById(R.id.feed_item_avatar);
             TextView time = (TextView) convertView.findViewById(R.id.feed_item_timestamp);
             TextView message = (TextView) convertView.findViewById(R.id.feed_item_message);
             author.setText(item.getAuthor());
-            icon.setText(item.getPicture());
-            time.setText(item.getDate());
+            Picasso.with(convertView.getContext()).load(item.getPicture()).into(icon);
+            time.setText(item.getDate().substring(0, 10));
             message.setText(item.getPost());
             return convertView;
         }
