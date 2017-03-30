@@ -5,18 +5,10 @@ package ftcc.initech.triadareaultimate.model;
  */
 
 public class NewsItem {
-    String mAuthor;
+
     String mDate;
     String mPost;
-    String mPicture;
-
-    public String getAuthor() {
-        return mAuthor;
-    }
-
-    public void setAuthor(String author) {
-        mAuthor = author;
-    }
+    FacebookPerson mPerson;
 
     public String getDate() {
         return mDate;
@@ -34,11 +26,11 @@ public class NewsItem {
         mPost = post;
     }
 
-    public String getPicture() {
-        return mPicture;
+    public FacebookPerson getPerson() {
+        return mPerson;
     }
 
-    public void setPicture(String picture) {
-        mPicture = picture;
+    public void setPerson(FacebookPerson person) {
+        mPerson = person;
     }
 }

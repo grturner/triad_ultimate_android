@@ -22,6 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ftcc.initech.triadareaultimate.R;
+import ftcc.initech.triadareaultimate.model.FacebookPerson;
 import ftcc.initech.triadareaultimate.model.NewsItem;
 
 /**
@@ -39,11 +40,14 @@ public class NewsFragment extends Fragment {
             newsArray[i] = new NewsItem();
             try {
                 JSONObject o = feedArray.getJSONObject(i);
-                newsArray[i].setAuthor(o.getString("id"));
+                FacebookPerson person = new FacebookPerson();
+                person.setId(o.getJSONObject("from").getString("id"));
+                person.setName(o.getJSONObject("from").getString("name"));
+                newsArray[i].setPerson(person);
                 newsArray[i].setDate(o.getString("created_time"));
                 newsArray[i].setPost(o.getString("message"));
                 // TODO: 3/27/2017 handle situation where facebook returns no full_picture
-                newsArray[i].setPicture(o.getString("full_picture"));
+                //newsArray[i].setPicture(o.getString("full_picture"));
             } catch (JSONException ex) {
                 ex.printStackTrace();
             }
@@ -56,7 +60,7 @@ public class NewsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
         final ListView listView = (ListView) view.findViewById(R.id.feed_list);
         Bundle params = new Bundle();
-        params.putString("fields", "message,created_time,id,full_picture");
+        params.putString("fields", "message,created_time,id,from");
         params.putString("limit", "20");
         params.putString("access_token", "1578803498826781|qNW39As051UT6x3tUVGivbUTfR4");
         new GraphRequest(
@@ -99,8 +103,8 @@ public class NewsFragment extends Fragment {
             ImageView icon = (ImageView) convertView.findViewById(R.id.feed_item_avatar);
             TextView time = (TextView) convertView.findViewById(R.id.feed_item_timestamp);
             TextView message = (TextView) convertView.findViewById(R.id.feed_item_message);
-            author.setText(item.getAuthor());
-            Picasso.with(convertView.getContext()).load(item.getPicture()).into(icon);
+            author.setText(item.getPerson().getName());
+            //Picasso.with(convertView.getContext()).load(item.getPicture()).into(icon);
             time.setText(item.getDate().substring(0, 10));
             message.setText(item.getPost());
             return convertView;

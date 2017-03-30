@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TriadAreaUltimate.iml" filepath="$PROJECT_DIR$/TriadAreaUltimate.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/triad_ultimate_android.iml" filepath="$PROJECT_DIR$/triad_ultimate_android.iml" />
     </modules>
